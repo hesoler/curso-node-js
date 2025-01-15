@@ -13,7 +13,6 @@ const connection = mysql.createConnection(config)
 export class MovieModel {
   static async getAll ({ genre }) {
     let result
-    console.log(genre)
 
     if (genre) {
       const lowerCaseGenre = genre.toLowerCase()
@@ -23,11 +22,11 @@ export class MovieModel {
       const [[{ id }]] = await resultGenre
 
       result = (await connection).query(
-        'SELECT title, year, director, duration, poster, rate, bin_to_uuid(id) id FROM movie LEFT JOIN movie_genres ON id = movie_id WHERE genre_id = ?;', [id]
+        'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie LEFT JOIN movie_genres ON id = movie_id WHERE genre_id = ?;', [id]
       )
     } else {
       result = (await connection).query(
-        'SELECT title, year, director, duration, poster, rate, bin_to_uuid(id) id FROM movie'
+        'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie'
       )
     }
 

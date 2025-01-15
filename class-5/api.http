@@ -5,7 +5,7 @@ GET http://localhost:3000/movies
 GET http://localhost:3000/movies/d2c509c1-d10c-11ef-b5dc-fe670a378a5f
 
 ### Recuperar todas las películas por un género
-GET http://localhost:3000/movies?genre=action
+GET http://localhost:3000/movies?genre=CRIME
 
 ### Crear una película
 POST http://localhost:3000/movies
