@@ -46,14 +46,78 @@ export class MovieModel {
   }
 
   static async create ({ input }) {
+    const {
+      genre: genreInput, // genre es un arreglo
+      title,
+      year,
+      director,
+      duration,
+      rate,
+      poster
+    } = input
 
+    const uuidResult = (await connection).query('SELECT UUID() uuid;')
+    const [[{ uuid }]] = await uuidResult
+
+    try {
+      await (await connection).query(
+        `INSERT INTO movie (id, title, year, director, duration, poster, rate)
+      VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?);`,
+        [title, year, director, duration, poster, rate]
+      )
+    } catch (err) {
+      throw new Error('Error creating movie')
+      // TODO enviar la traza a un servicio interno
+      // sendLog(err)
+    }
+
+    const [[movie]] = await (await connection).query(
+      'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie WHERE id = UUID_TO_BIN(?); ', [uuid]
+    )
+
+    return movie
   }
 
   static async delete ({ id }) {
+    try {
+      const result = await (await connection).query(
+        `DELETE FROM movie WHERE id = UUID_TO_BIN("${id}")`
+      )
+      const [{ affectedRows }] = result
 
+      return affectedRows === 1
+    } catch (error) {
+      throw new Error('Error deleting movie')
+    }
   }
 
   static async update ({ id, input }) {
+    let query = 'UPDATE movie SET '
+    const updates = []
 
+    for (const key in input) {
+      if (key !== 'genre') {
+        updates.push(`${key} = ?`)
+      }
+    }
+
+    query += updates.join(', ')
+    query += ` WHERE id = UUID_TO_BIN("${id}")`
+
+    const values = Object.values(input)
+    values.push(id)
+
+    try {
+      const result = await (await connection).query(query, values)
+      const [{ affectedRows }] = result
+
+      if (affectedRows === 1) {
+        return this.getById({ id })
+      } else {
+        return false
+      }
+    } catch (error) {
+      throw new Error('Error updating movie')
+    }
   }
 }

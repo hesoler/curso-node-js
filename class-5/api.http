@@ -23,14 +23,16 @@ Content-Type: application/json
 }
 
 ### Actualizar una película
-PATCH http://localhost:3000/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+PATCH http://localhost:3000/movies/54675a98-d453-11ef-88e1-10f005bd5605
 Content-Type: application/json
 
 {
-    "rate": 0
+    "rate": 8,
+    "sql": "select * from users",
+    "title": "The Grandpha"
 }
 
 
 ### Borrar una pelicula
-DELETE  http://localhost:3000/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+DELETE  http://localhost:3000/movies/d7e7f6da-d44f-11ef-88e1-10f005bd5605
 
