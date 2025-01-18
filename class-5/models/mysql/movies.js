@@ -65,6 +65,27 @@ export class MovieModel {
       VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?);`,
         [title, year, director, duration, poster, rate]
       )
+
+      const { genre: arrayGenreInput } = input
+      if (arrayGenreInput) {
+        const queryGenreNameList = arrayGenreInput
+          .map(genreName => { return `"${genreName.toLowerCase()}"` })
+          .join(', ')
+
+        const [[{ ids }]] = await (await connection).query(
+          `SELECT GROUP_CONCAT(id) as ids FROM genre WHERE LOWER(name) in (${queryGenreNameList});`
+        )
+
+        let queryUpdateMovieGenre = 'INSERT INTO movie_genres (movie_id, genre_id) VALUES '
+
+        const movieGenreValues = ids
+          .split(',')
+          .map(genreId => { return `(UUID_TO_BIN("${uuid}"), ${genreId})` })
+          .join(', ')
+
+        queryUpdateMovieGenre += movieGenreValues + ';'
+        await (await connection).query(queryUpdateMovieGenre)
+      }
     } catch (err) {
       throw new Error('Error creating movie')
       // TODO enviar la traza a un servicio interno
@@ -81,7 +102,7 @@ export class MovieModel {
   static async delete ({ id }) {
     try {
       const result = await (await connection).query(
-        `DELETE FROM movie WHERE id = UUID_TO_BIN("${id}")`
+        `DELETE FROM movie WHERE id = UUID_TO_BIN("${id}");`
       )
       const [{ affectedRows }] = result
 
@@ -108,7 +129,32 @@ export class MovieModel {
     values.push(id)
 
     try {
+      // actualizar primero la tabla movies
       const result = await (await connection).query(query, values)
+
+      const { genre: arrayGenreInput } = input
+      if (arrayGenreInput) {
+        const queryGenreNameList = arrayGenreInput
+          .map(genreName => { return `"${genreName.toLowerCase()}"` })
+          .join(', ')
+
+        const [[{ ids }]] = await (await connection).query(
+          `SELECT GROUP_CONCAT(id) as ids FROM genre WHERE LOWER(name) in (${queryGenreNameList});`
+        )
+
+        // eliminar las anteriores referencias de la movie e insertar las nuevas
+        await (await connection).query(`DELETE FROM movie_genres WHERE movie_id = UUID_TO_BIN("${id}");`)
+
+        let queryUpdateMovieGenre = 'INSERT INTO movie_genres (movie_id, genre_id) VALUES '
+
+        const movieGenreValues = ids
+          .split(',')
+          .map(genreId => { return `(UUID_TO_BIN("${id}"), ${genreId})` })
+          .join(', ')
+
+        queryUpdateMovieGenre += movieGenreValues + ';'
+        await (await connection).query(queryUpdateMovieGenre)
+      }
       const [{ affectedRows }] = result
 
       if (affectedRows === 1) {
