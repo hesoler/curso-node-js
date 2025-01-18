@@ -47,7 +47,7 @@ export class MovieModel {
 
   static async create ({ input }) {
     const {
-      genre: genreInput, // genre es un arreglo
+      genre: arrayGenreInput, // genre es un arreglo
       title,
       year,
       director,
@@ -66,7 +66,6 @@ export class MovieModel {
         [title, year, director, duration, poster, rate]
       )
 
-      const { genre: arrayGenreInput } = input
       if (arrayGenreInput) {
         const queryGenreNameList = arrayGenreInput
           .map(genreName => { return `"${genreName.toLowerCase()}"` })
