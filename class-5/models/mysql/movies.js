@@ -8,7 +8,7 @@ const config = {
   port: 3306
 }
 
-const connection = mysql.createConnection(config)
+const connection = await mysql.createConnection(config)
 
 export class MovieModel {
   static async getAll ({ genre }) {
@@ -16,16 +16,16 @@ export class MovieModel {
 
     if (genre) {
       const lowerCaseGenre = genre.toLowerCase()
-      const resultGenre = (await connection).query(
+      const resultGenre = connection.query(
         'SELECT id, name FROM genre WHERE LOWER(name) like ?;', [lowerCaseGenre]
       )
       const [[{ id }]] = await resultGenre
 
-      result = (await connection).query(
+      result = connection.query(
         'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie LEFT JOIN movie_genres ON id = movie_id WHERE genre_id = ?;', [id]
       )
     } else {
-      result = (await connection).query(
+      result = connection.query(
         'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie'
       )
     }
@@ -37,7 +37,7 @@ export class MovieModel {
   static async getById ({ id }) {
     if (!id) return
 
-    const result = (await connection).query(
+    const result = connection.query(
       'select title, year, director, duration, poster, rate, bin_to_uuid(id) id from movie where id = uuid_to_bin(?); ', [id]
     )
 
@@ -56,11 +56,11 @@ export class MovieModel {
       poster
     } = input
 
-    const uuidResult = (await connection).query('SELECT UUID() uuid;')
+    const uuidResult = connection.query('SELECT UUID() uuid;')
     const [[{ uuid }]] = await uuidResult
 
     try {
-      await (await connection).query(
+      connection.query(
         `INSERT INTO movie (id, title, year, director, duration, poster, rate)
       VALUES (UUID_TO_BIN("${uuid}"), ?, ?, ?, ?, ?, ?);`,
         [title, year, director, duration, poster, rate]
@@ -71,7 +71,7 @@ export class MovieModel {
           .map(genreName => { return `"${genreName.toLowerCase()}"` })
           .join(', ')
 
-        const [[{ ids }]] = await (await connection).query(
+        const [[{ ids }]] = await connection.query(
           `SELECT GROUP_CONCAT(id) as ids FROM genre WHERE LOWER(name) in (${queryGenreNameList});`
         )
 
@@ -83,7 +83,7 @@ export class MovieModel {
           .join(', ')
 
         queryUpdateMovieGenre += movieGenreValues + ';'
-        await (await connection).query(queryUpdateMovieGenre)
+        connection.query(queryUpdateMovieGenre)
       }
     } catch (err) {
       throw new Error('Error creating movie')
@@ -91,7 +91,7 @@ export class MovieModel {
       // sendLog(err)
     }
 
-    const [[movie]] = await (await connection).query(
+    const [[movie]] = await connection.query(
       'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie WHERE id = UUID_TO_BIN(?); ', [uuid]
     )
 
@@ -100,10 +100,13 @@ export class MovieModel {
 
   static async delete ({ id }) {
     try {
-      const result = await (await connection).query(
+      const result = await connection.query(
         `DELETE FROM movie WHERE id = UUID_TO_BIN("${id}");`
       )
       const [{ affectedRows }] = result
+
+      // eliminar las referencias en movie_genres
+      connection.query(`DELETE FROM movie_genres WHERE movie_id = UUID_TO_BIN("${id}");`)
 
       return affectedRows === 1
     } catch (error) {
@@ -129,7 +132,7 @@ export class MovieModel {
 
     try {
       // actualizar primero la tabla movies
-      const result = await (await connection).query(query, values)
+      const result = await connection.query(query, values)
 
       const { genre: arrayGenreInput } = input
       if (arrayGenreInput) {
@@ -137,12 +140,12 @@ export class MovieModel {
           .map(genreName => { return `"${genreName.toLowerCase()}"` })
           .join(', ')
 
-        const [[{ ids }]] = await (await connection).query(
+        const [[{ ids }]] = await connection.query(
           `SELECT GROUP_CONCAT(id) as ids FROM genre WHERE LOWER(name) in (${queryGenreNameList});`
         )
 
-        // eliminar las anteriores referencias de la movie e insertar las nuevas
-        await (await connection).query(`DELETE FROM movie_genres WHERE movie_id = UUID_TO_BIN("${id}");`)
+        // eliminar las anteriores referencias en movie_genres e insertar las nuevas
+        connection.query(`DELETE FROM movie_genres WHERE movie_id = UUID_TO_BIN("${id}");`)
 
         let queryUpdateMovieGenre = 'INSERT INTO movie_genres (movie_id, genre_id) VALUES '
 
@@ -152,7 +155,7 @@ export class MovieModel {
           .join(', ')
 
         queryUpdateMovieGenre += movieGenreValues + ';'
-        await (await connection).query(queryUpdateMovieGenre)
+        connection.query(queryUpdateMovieGenre)
       }
       const [{ affectedRows }] = result
 
