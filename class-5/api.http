@@ -2,7 +2,7 @@
 GET http://localhost:3000/movies
 
 ### Recuperar una película por id
-GET http://localhost:3000/movies/d2c509c1-d10c-11ef-b5dc-fe670a378a5f
+GET http://localhost:3000/movies/38bb1047-d56d-11ef-83f6-10f005bd5605
 
 ### Recuperar todas las películas por un género
 GET http://localhost:3000/movies?genre=CRIME
@@ -23,17 +23,17 @@ Content-Type: application/json
 }
 
 ### Actualizar una película
-PATCH http://localhost:3000/movies/8995df21-d569-11ef-83f6-10f005bd5605
+PATCH http://localhost:3000/movies/5914add0-d5f8-11ef-8548-10f005bd5605
 Content-Type: application/json
 
 {
-    "rate": 8,
+    "rate": 8.2,
     "sql": "select * from users",
-    "title": "The Godfather",
+    "title": "The Dad",
     "genre": ["Action", "Romance"]
 }
 
 
 ### Borrar una pelicula
-DELETE  http://localhost:3000/movies/8995df21-d569-11ef-83f6-10f005bd5605
+DELETE  http://localhost:3000/movies/5914add0-d5f8-11ef-8548-10f005bd5605
 

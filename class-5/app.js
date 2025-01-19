@@ -1,30 +1,22 @@
 import express, { json } from 'express'
-import { moviesRouter } from './routes/movies.js'
 import { corsMiddleware } from './middlewares/cors.js'
+import { createMovieRouter } from './routes/movies.js'
 
-// como leer json en ESModules
-// import fs from 'node:fs'
-// const movies = JSON.parse(fs.readFileSync('./movies.json', 'utf-8'))
+export const createaApp = ({ movieModel }) => {
+  const app = express()
+  app.disable('x-powered-by')
+  app.use(json())
+  app.use(corsMiddleware())
 
-// en el futuro se usará esta forma
-// import movies from'./movies.json with { type: 'json' }
+  app.get('/', (req, res) => {
+    res.json({ message: 'hola mundo' })
+  })
 
-//* forma recomendada
-// const movies = readJSON('./movies.json')
+  app.use('/movies', createMovieRouter({ movieModel }))
 
-const app = express()
-app.disable('x-powered-by')
-app.use(json())
-app.use(corsMiddleware())
+  const PORT = process.env.PORT ?? 3000
 
-app.get('/', (req, res) => {
-  res.json({ message: 'hola mundo' })
-})
-
-app.use('/movies', moviesRouter)
-
-const PORT = process.env.PORT ?? 3000
-
-app.listen(PORT, () => {
-  console.log(`server listening on port http://localhost:${PORT}`)
-})
+  app.listen(PORT, () => {
+    console.log(`server listening on port http://localhost:${PORT}`)
+  })
+}
