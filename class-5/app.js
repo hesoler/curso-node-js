@@ -2,7 +2,7 @@ import express, { json } from 'express'
 import { corsMiddleware } from './middlewares/cors.js'
 import { createMovieRouter } from './routes/movies.js'
 
-export const createaApp = ({ movieModel }) => {
+export const createApp = ({ movieModel }) => {
   const app = express()
   app.disable('x-powered-by')
   app.use(json())
