@@ -28,6 +28,7 @@ const ACCEPTED_ORIGINS = [
   'http://localhost:8080',
   'http://localhost:3000',
   'http://localhost:5173',
+  'http://localhost:63343',
   'http://movies.com'
 ]
 
@@ -37,7 +38,7 @@ app.get('/', (req, res) => {
 
 app.get('/movies', (req, res) => {
   const origin = req.header('origin')
-  if (ACCEPTED_ORIGINS.includes(origin) || !origin) {
+  if (origin && ACCEPTED_ORIGINS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin)
   }
 
@@ -100,7 +101,7 @@ app.patch('/movies/:id', (req, res) => {
 
 app.delete('/movies/:id', (req, res) => {
   const origin = req.header('origin')
-  if (ACCEPTED_ORIGINS.includes(origin) || !origin) {
+  if (origin && ACCEPTED_ORIGINS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin)
   }
 
@@ -118,7 +119,7 @@ app.delete('/movies/:id', (req, res) => {
 app.options('/movies/:id', (req, res) => {
   const origin = req.header('origin')
 
-  if (ACCEPTED_ORIGINS.includes(origin) || !origin) {
+  if (origin && ACCEPTED_ORIGINS.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin)
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE')
   }
