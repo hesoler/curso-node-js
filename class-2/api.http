@@ -6,9 +6,9 @@ POST http://localhost:3000/pokemon
 Content-Type: application/json
 
 {
-    "name": "ditto",
-    "type": "normal",
-    "moves": [
-        "transform"
-    ]
+  "name": "ditto",
+  "type": "normal",
+  "moves": [
+    "transform"
+  ]
 }

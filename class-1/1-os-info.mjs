@@ -1,4 +1,4 @@
-import { platform, release, arch, cpus, freemem, totalmem, uptime } from 'node:os'
+import { arch, cpus, freemem, platform, release, totalmem, uptime } from 'node:os'
 
 console.log('Información del sistema operativo:')
 console.log('-------------------------')
