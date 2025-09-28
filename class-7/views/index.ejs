@@ -76,9 +76,9 @@
 <div class="container">
     <% if (typeof username !== 'undefined' ) { %>
         <div class="form-container">
-            <h2>Hola <%= username %>!</h2>
-            <p>Estas en el panel de administracion</p>
-            <button id="close-session">Cerrar sesion</button>
+            <h2>Hello <%= username %>!</h2>
+            <p>You are in the administration panel</p>
+            <button id="close-session">Cerrar sesión</button>
         </div>
     <% } %>
 
@@ -140,13 +140,13 @@
       body: JSON.stringify({ username, password })
     }).then(res => {
       if (res.ok) {
-        loginSpan.innerText = 'Sesion iniciada... Entrando...'
+        loginSpan.innerText = 'Session started... Entering...'
         loginSpan.style.color = 'green'
         setTimeout(() => {
           window.location.href = '/protected'
         }, 2000)
       } else {
-        loginSpan.innerText = 'Error al iniciar sesion'
+        loginSpan.innerText = 'Error starting session'
         loginSpan.style.color = 'red'
       }
     })
@@ -159,7 +159,7 @@
     const confirmPassword = $('#register-confirm-password').value
 
     if (password !== confirmPassword) {
-      registerSpan.innerText = 'Las contraseñas no coinciden'
+      registerSpan.innerText = 'The passwords do not match'
       registerSpan.style.color = 'red'
       return
     }
@@ -172,13 +172,13 @@
       body: JSON.stringify({ username, password })
     }).then(res => {
       if (res.ok) {
-        registerSpan.innerText = 'Usuario registrado... Entrando...'
+        registerSpan.innerText = 'Usuario registered... Logging in...'
         registerSpan.style.color = 'green'
         setTimeout(() => {
           window.location.href = '/protected'
         }, 2000)
       } else {
-        registerSpan.innerText = 'Error al registrar el usuario'
+        registerSpan.innerText = 'Error registering user'
         registerSpan.style.color = 'red'
       }
     })
