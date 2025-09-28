@@ -184,7 +184,7 @@
     })
   })
 
-  logoutButton?.addEventListener('click', e => {
+  logoutButton?.addEventListener('click', _ => {
     fetch('/logout', {
       method: 'POST'
     }).then(res => {
